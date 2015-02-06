@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="jquery.touchpull.js"></script>
+		<script>
+			$(document).ready(function() {
+				$(window).touchpull().on('touchpull',function() {
+					$('body').append('stop pulling!<br/>');
+				});
+			});
+		</script>
+		<style type="text/css">
+			body {
+				-webkit-overflow-scrolling:touch;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>pull me up</h1>
+	</body>
+</html>
