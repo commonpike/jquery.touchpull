@@ -11,7 +11,8 @@
 	$.fn.touchpull = function( options ) {
 	
 		var settings = {
-		
+			treshold	: 200, // px to pull up before it awakes
+			timeout		: 100  // desktop only: timeout to trigger scrollstop
 		}
 		settings = $.extend(settings,options);
 		
@@ -29,44 +30,42 @@
 			
 			// touch
 			$this.on('touchmove', function (ev) {
-				if ($this.scrollTop()<0) {
+				var st = $this.scrollTop();
+				if (st<-settings.treshold) {
 					$this.data('pulling',true);
-				} else if ($this.scrollTop()>0) {
-					$this.data('pulling',false);
-				} else {
+				} else if (st>=0) {
 					$this.data('pulling',false);
 					triggered=false;
 				}
-				if (debug && window.console) console.log($this.scrollTop()+' '+$this.data('pulling'));
+				if (debug && window.console) console.log(st+' '+$this.data('pulling'));
 			}).on('touchend', function(ev) {
-				if ($this.data('pulling')) {
+				if ($this.data('pulling') && !triggered) {
 					if (debug && window.console) console.log('trigger touchpull');
 					$this.trigger('touchpull');
-					triggered=true;
+					triggered=true; // block triggering until were get back to 0
 				}
 				$this.data('pulling',false);
 			});
 			
 			// desktop
 			$this.on('scroll', function (ev) {
+				var st = $this.scrollTop();
 				clearTimeout(stoptimer);
 				stoptimer = setTimeout(function() {
 					$this.trigger('scrollstop');
-				},100);
-				if ($this.scrollTop()<0) {
+				},settings.timeout);
+				if (st<-settings.treshold) {
 					$this.data('pulling',true);
-				} else if ($this.scrollTop()>0) {
-					$this.data('pulling',false);
-				} else {
+				} else if (st>=0) {
 					$this.data('pulling',false);
 					triggered=false;
 				}
-				if (window.console) console.log($this.scrollTop()+' '+$this.data('pulling'));
+				if (debug && window.console) console.log(st+' '+$this.data('pulling'));
 			}).on('scrollstop', function(ev) {
 				if ($this.data('pulling') && !triggered) {
 					$this.trigger('touchpull');
-					triggered=true;
-					if (window.console) console.log('trigger touchpull');
+					triggered=true; // block triggering until were get back to 0
+					if (debug && window.console) console.log('trigger touchpull');
 				}
 				$this.data('pulling',false);
 			})
